@@ -56,3 +56,44 @@ public static string Encrypt(string stringToEncrypt)
             return System.Text.Encoding.Default.GetString(ms.ToArray());
         }
 ```
+# Oracle Realized
+```Oracle
+create or replace function Func_encrypt_des(p_text varchar2)
+return varchar2 is
+p_key varchar2(20);
+v_text varchar2(4000);
+v_enc varchar2(4000);
+raw_input RAW(128) ;
+key_input RAW(128) ;
+decrypted_raw RAW(2048);
+begin 
+    p_key:='EnCryptK';
+  if p_text is null or p_text='' then
+    return '';
+  end if;
+v_text := rpad( p_text, (trunc(length(p_text)/8)+1)*8, chr(0));
+raw_input := UTL_RAW.CAST_TO_RAW(v_text);
+key_input := UTL_RAW.CAST_TO_RAW(p_key);
+dbms_obfuscation_toolkit.DESEncrypt(input => raw_input,key => key_input,encrypted_data =>decrypted_raw);
+v_enc := rawtohex(decrypted_raw);
+return v_enc;
+end;
+
+create or replace function Func_decrypt_des(p_text varchar2)
+return varchar2 is
+p_key varchar2(20);
+v_text varchar2(2000); 
+begin
+ if nvl(p_text,'-1')='-1' then
+   return '';
+ end if;
+ p_key:='EnCryptK';
+dbms_obfuscation_toolkit.DESDECRYPT(input_string => UTL_RAW.CAST_TO_varchar2(p_text),key_string =>p_key, decrypted_string=> v_text);
+v_text := rtrim(v_text,chr(0));
+dbms_output.put_line(v_text);
+return v_text;
+exception 
+  when others  then
+  return '';
+end;
+```
