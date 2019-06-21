@@ -57,7 +57,7 @@ public static string Encrypt(string stringToEncrypt)
         }
 ```
 # Oracle Realized
-```Oracle
+```SQL
 create or replace function Func_encrypt_des(p_text varchar2)
 return varchar2 is
 p_key varchar2(20);
